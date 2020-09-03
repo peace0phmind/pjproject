@@ -57,6 +57,8 @@ static void parse_time(pj_scanner *scanner, pjmedia_sdp_session *ses,
 		       parse_context *ctx);
 static void parse_generic_line(pj_scanner *scanner, pj_str_t *str,
 			       parse_context *ctx);
+static void parse_other_line(pj_scanner *scanner, pjmedia_sdp_session *ses,
+	parse_context *ctx, pj_pool_t *pool);
 static void parse_connection_info(pj_scanner *scanner, pjmedia_sdp_conn *conn,
 				  parse_context *ctx);
 static void parse_bandwidth_info(pj_scanner *scanner, pjmedia_sdp_bandw *bandw,
@@ -955,6 +957,24 @@ static int print_session(const pjmedia_sdp_session *ses,
 	p += printed;
     }
 
+	// 输出其他参数
+	for (i = 0; i < ses->other_count; ++i) {
+		if (0 >= ses->other[i]->name.slen)
+		{
+			continue;
+		}
+		pj_memcpy(p, ses->other[i]->name.ptr, ses->other[i]->name.slen);
+		p += ses->other[i]->name.slen;
+		*p++ = '=';
+		if (0 <  ses->other[i]->value.slen)
+		{
+			pj_memcpy(p, ses->other[i]->value.ptr, ses->other[i]->value.slen);
+			p += ses->other[i]->value.slen;
+		}
+		*p++ = '\r';
+		*p++ = '\n';
+	}
+
     return (int)(p-buf);
 }
 
@@ -1077,6 +1097,42 @@ static void parse_generic_line(pj_scanner *scanner, pj_str_t *str,
 
     /* newline. */
     pj_scan_get_newline(scanner);
+}
+
+
+static void parse_other_line(pj_scanner *scanner, pjmedia_sdp_session *ses,
+	parse_context *ctx, pj_pool_t *pool)
+{
+	pjmedia_sdp_attr *attr;
+
+	ctx->last_error = PJMEDIA_SDP_EINATTR;
+
+	attr = PJ_POOL_ALLOC_T(pool, pjmedia_sdp_attr);
+
+	/* check equal sign */
+	if (*(scanner->curptr + 1) != '=') {
+		on_scanner_error(scanner);
+		return;
+	}
+
+	/* x= */
+	attr->name.ptr = (char*)pj_pool_alloc(pool, 1);
+	*(attr->name.ptr) = *(scanner->curptr);
+	attr->name.slen = 1;
+
+	pj_scan_advance_n(scanner, 2, SKIP_WS);
+
+	/* get anything until newline (including whitespaces). */
+	pj_scan_get_until_chr(scanner, "\r\n", &attr->value);
+
+	/* newline. */
+	pj_scan_get_newline(scanner);
+
+	if (ses->other_count < PJMEDIA_MAX_SDP_ATTR)
+	{
+		ses->other[ses->other_count] = attr;
+		++ses->other_count;
+	}
 }
 
 static void parse_connection_info(pj_scanner *scanner, pjmedia_sdp_conn *conn,
@@ -1418,8 +1474,10 @@ PJ_DEF(pj_status_t) pjmedia_sdp_parse( pj_pool_t *pool,
 		    }
 		    break;
 		default:
-		    if (cur_name >= 'a' && cur_name <= 'z')
-			parse_generic_line(&scanner, &dummy, &ctx);
+		    if (cur_name >= 'a' && cur_name <= 'z') {
+                parse_other_line(&scanner, session, &ctx, pool);
+            }
+
 		    else  {
 			ctx.last_error = PJMEDIA_SDP_EINSDP;
 			on_scanner_error(&scanner);
@@ -1514,6 +1572,12 @@ PJ_DEF(pjmedia_sdp_session*) pjmedia_sdp_session_clone( pj_pool_t *pool,
     for (i=0; i<rhs->media_count; ++i) {
 	sess->media[i] = pjmedia_sdp_media_clone(pool, rhs->media[i]);
     }
+
+    /* Duplicate other descriptors. */
+    sess->other_count = rhs->other_count;
+	for (i = 0; i < rhs->other_count; ++i) {
+		sess->other[i] = pjmedia_sdp_attr_clone(pool, rhs->other[i]);
+	}
 
     return sess;
 }

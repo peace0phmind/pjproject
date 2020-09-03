@@ -682,6 +682,8 @@ struct pjmedia_sdp_session
     unsigned	       media_count;		/**< Number of media.	    */
     pjmedia_sdp_media *media[PJMEDIA_MAX_SDP_MEDIA];	/**< Media array.   */
 
+	unsigned	       other_count;		/**< Number of Others.  */
+	pjmedia_sdp_attr  *other[PJMEDIA_MAX_SDP_ATTR]; /**< Others array.   */
 };
 
 /**

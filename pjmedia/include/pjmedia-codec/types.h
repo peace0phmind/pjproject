@@ -114,19 +114,44 @@ enum pjmedia_audio_pt
  * These are the dynamic payload types that are used by video codecs in
  * this library.
  */
+// enum pjmedia_video_pt
+// {
+//      /* Video payload types */
+//      PJMEDIA_RTP_PT_VID_START = (PJMEDIA_RTP_PT_DYNAMIC-1),
+//      PJMEDIA_RTP_PT_H263P,
+//      PJMEDIA_RTP_PT_H264,
+//      PJMEDIA_RTP_PT_H264_RSV1,
+//      PJMEDIA_RTP_PT_H264_RSV2,
+//      PJMEDIA_RTP_PT_H264_RSV3,
+//      PJMEDIA_RTP_PT_H264_RSV4,
+
+//      PJMEDIA_RTP_PT_VP8,
+//      PJMEDIA_RTP_PT_VP9,
+
+//      /* Caution!
+//       * Ensure the value of the last pt above is <= 127.
+//       */
+// };
+
+// gb28181
 enum pjmedia_video_pt
 {
-     /* Video payload types */
-     PJMEDIA_RTP_PT_VID_START = (PJMEDIA_RTP_PT_DYNAMIC-1),
-     PJMEDIA_RTP_PT_H263P,
-     PJMEDIA_RTP_PT_H264,
-     PJMEDIA_RTP_PT_H264_RSV1,
-     PJMEDIA_RTP_PT_H264_RSV2,
-     PJMEDIA_RTP_PT_H264_RSV3,
-     PJMEDIA_RTP_PT_H264_RSV4,
+    /* Video payload types */
+    PJMEDIA_RTP_PT_VID_START = (PJMEDIA_RTP_PT_DYNAMIC-1),
+    PJMEDIA_RTP_PT_PS,
+    PJMEDIA_RTP_PT_MPEG4,
+    PJMEDIA_RTP_PT_H264,
+    PJMEDIA_RTP_PT_SVC,
 
-     PJMEDIA_RTP_PT_VP8,
-     PJMEDIA_RTP_PT_VP9,
+    // under gb28181 not use
+    PJMEDIA_RTP_PT_H263P,
+    PJMEDIA_RTP_PT_H264_RSV1,
+    PJMEDIA_RTP_PT_H264_RSV2,
+    PJMEDIA_RTP_PT_H264_RSV3,
+    PJMEDIA_RTP_PT_H264_RSV4,
+
+    PJMEDIA_RTP_PT_VP8,
+    PJMEDIA_RTP_PT_VP9,
 
      /* Caution!
       * Ensure the value of the last pt above is <= 127.
