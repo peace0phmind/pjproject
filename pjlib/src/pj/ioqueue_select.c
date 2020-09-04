@@ -88,7 +88,7 @@
 */
 #define VALIDATE_FD_SET     0
 
-#if 1
+#if 0
 #  define TRACE__(args)	PJ_LOG(3,args)
 #else
 #  define TRACE__(args)
