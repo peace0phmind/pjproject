@@ -51,8 +51,8 @@
  * The trace will contain JB operation timestamp, frame info, RTP info, and
  * the JB state right after the operation.
  */
-#define TRACE_JB			0	/* Enable/disable trace.    */
-#define TRACE_JB_PATH_PREFIX		""	/* Optional path/prefix
+#define TRACE_JB			1	/* Enable/disable trace.    */
+#define TRACE_JB_PATH_PREFIX		"./"	/* Optional path/prefix
 						   for the CSV filename.    */
 #if TRACE_JB
 #   include <pj/file_io.h>
@@ -943,7 +943,9 @@ static void on_rx_rtp( pjmedia_tp_cb_param *param)
 				pj_ntohs(hdr->seq), pj_ntohl(hdr->ts), NULL);
 
 #if TRACE_JB
-	trace_jb_put(stream, hdr, payloadlen, count);
+	pjmedia_jb_state state;
+	pjmedia_jbuf_get_state(stream->jb, &state);
+	trace_jb_put(stream, hdr, payloadlen, state.size);
 #endif
 
     }
@@ -1994,8 +1996,8 @@ PJ_DEF(pj_status_t) pjmedia_vid_stream_create(
 
 	pj_ansi_snprintf(trace_name, sizeof(trace_name),
 			 TRACE_JB_PATH_PREFIX "%s.csv",
-			 channel->port.info.name.ptr);
-	status = pj_file_open(pool, trace_name, PJ_O_RDWR,
+			 stream->dec->port.info.name.ptr);
+	status = pj_file_open(pool, trace_name, PJ_O_WRONLY,
 			      &stream->trace_jb_fd);
 	if (status != PJ_SUCCESS) {
 	    stream->trace_jb_fd = TRACE_JB_INVALID_FD;
