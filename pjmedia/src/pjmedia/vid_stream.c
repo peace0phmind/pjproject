@@ -1283,7 +1283,7 @@ static pj_status_t decode_frame(pjmedia_vid_stream *stream,
                                 pjmedia_frame *frame)
 {
     pjmedia_vid_channel *channel = stream->dec;
-    pj_uint32_t last_ts = 0, frm_ts = 0;
+    pj_uint32_t last_ts = -1, frm_ts = 0;
     int frm_first_seq = 0, frm_last_seq = 0;
     pj_bool_t got_frame = PJ_FALSE;
     unsigned cnt, frm_pkt_cnt = 0, frm_cnt = 0;
@@ -1292,7 +1292,6 @@ static pj_status_t decode_frame(pjmedia_vid_stream *stream,
     /* Repeat get payload from the jitter buffer until all payloads with same
      * timestamp are collected.
      */
-
     /* Check if we got a decodable frame */
     for (cnt=0; ; ) {
         char ptype;
@@ -1309,7 +1308,7 @@ static pj_status_t decode_frame(pjmedia_vid_stream *stream,
                 continue;
             }
 
-            if (last_ts == 0) {
+            if (last_ts == -1) {
                 last_ts = ts;
 
                 /* Init timestamp and first seq of the first frame */
@@ -1352,8 +1351,8 @@ static pj_status_t decode_frame(pjmedia_vid_stream *stream,
         /* Check if the packet count for this frame exceeds the limit */
         if (frm_pkt_cnt > stream->rx_frame_cnt) {
             PJ_LOG(1,(channel->port.info.name.ptr,
-                      "Discarding %u frames because array is full!",
-                      frm_pkt_cnt - stream->rx_frame_cnt));
+                      "Discarding %u frames because array is full! frm_pkt_cnt %d, rx_frame_cnt %d",
+                      frm_pkt_cnt - stream->rx_frame_cnt, frm_pkt_cnt, stream->rx_frame_cnt));
             pjmedia_jbuf_remove_frame(stream->jb,
                                       frm_pkt_cnt - stream->rx_frame_cnt);
             frm_pkt_cnt = stream->rx_frame_cnt;
@@ -1384,6 +1383,7 @@ static pj_status_t decode_frame(pjmedia_vid_stream *stream,
             }
         }
 
+        PJ_LOG(4, (THIS_FILE, "Decode frames: ts: %d, pkt count: %d", frm_ts, frm_pkt_cnt));
         /* Decode */
         status = pjmedia_vid_codec_decode(stream->codec, frm_pkt_cnt,
                                           stream->rx_frames,
