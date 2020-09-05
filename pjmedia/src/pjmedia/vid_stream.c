@@ -1373,12 +1373,14 @@ static pj_status_t decode_frame(pjmedia_vid_stream *stream,
                                     (const void**)&stream->rx_frames[i].buf,
                                     &stream->rx_frames[i].size, &ptype,
                                     NULL, NULL, &frm_last_seq);
+            stream->rx_frames[i].rtp_seq = frm_last_seq;
 
             if (ptype != PJMEDIA_JB_NORMAL_FRAME) {
                 /* Packet lost, must set payload to NULL and keep going */
                 stream->rx_frames[i].buf = NULL;
                 stream->rx_frames[i].size = 0;
                 stream->rx_frames[i].type = PJMEDIA_FRAME_TYPE_NONE;
+                stream->rx_frames[i].rtp_seq = -1;
                 continue;
             }
         }

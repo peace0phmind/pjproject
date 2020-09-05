@@ -64,6 +64,7 @@ typedef struct pjmedia_frame
 					 at the octet boundary, so this field
 					 may be used for specifying start &
 					 end bit offset.		    */
+    pj_uint32_t      rtp_seq;
 } pjmedia_frame;
 
 
