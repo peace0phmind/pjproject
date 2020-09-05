@@ -1383,7 +1383,6 @@ static pj_status_t decode_frame(pjmedia_vid_stream *stream,
             }
         }
 
-        PJ_LOG(4, (THIS_FILE, "Decode frames: ts: %d, pkt count: %d", frm_ts, frm_pkt_cnt));
         /* Decode */
         status = pjmedia_vid_codec_decode(stream->codec, frm_pkt_cnt,
                                           stream->rx_frames,
