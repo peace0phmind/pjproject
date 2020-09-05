@@ -51,7 +51,7 @@
  * The trace will contain JB operation timestamp, frame info, RTP info, and
  * the JB state right after the operation.
  */
-#define TRACE_JB                        1        /* Enable/disable trace.    */
+#define TRACE_JB                        0        /* Enable/disable trace.    */
 #define TRACE_JB_PATH_PREFIX                "./"        /* Optional path/prefix
                                                    for the CSV filename.    */
 #if TRACE_JB
