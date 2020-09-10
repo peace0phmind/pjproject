@@ -1386,6 +1386,9 @@ static pj_status_t decode_frame(pjmedia_vid_stream *stream,
         }
 
         /* Decode */
+        // gb28181 copy stream->cname to buf. stream->cname is equals call cname
+        pj_memcpy(frame->buf, stream->cname.ptr, stream->cname.slen);
+        pj_bzero(frame->buf + stream->cname.slen, 4);
         status = pjmedia_vid_codec_decode(stream->codec, frm_pkt_cnt,
                                           stream->rx_frames,
                                           (unsigned)frame->size, frame);
