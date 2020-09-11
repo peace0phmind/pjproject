@@ -1770,6 +1770,9 @@ PJ_DEF(pj_status_t) pjmedia_vid_stream_create(
 
     stream->jb_last_frm = PJMEDIA_JB_NORMAL_FRAME;
 
+    // gb28181
+    stream->last_dec_ts = -1;
+
 #if defined(PJMEDIA_STREAM_ENABLE_KA) && PJMEDIA_STREAM_ENABLE_KA!=0
     stream->use_ka = info->use_ka;
 #endif
